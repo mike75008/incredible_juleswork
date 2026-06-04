@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --brand-red: #D32F2F;
+  --brand-gold: #D4AF37;
+  --brand-gold-hover: #C5A028;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+@theme {
+  --color-brand-red: var(--brand-red);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-hover: var(--brand-gold-hover);
+}
+
+@layer components {
+  .btn-gold {
+    @apply bg-brand-gold text-white font-semibold py-2 px-4 rounded transition-colors hover:bg-brand-gold-hover;
+  }
+
+  .card-premium {
+    @apply bg-white border border-gray-100 shadow-sm rounded-lg hover:shadow-md transition-shadow;
+  }
+}
