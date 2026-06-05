@@ -1,42 +1,45 @@
 "use client";
 
 import React from 'react';
-import { Mail, MessageCircle, CheckCheck, Clock, Eye } from 'lucide-react';
+import {
+  MessageSquare,
+  Mail,
+  LinkIcon,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  Eye,
+  Reply
+} from 'lucide-react';
 import { mockMessages, mockProspects } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 
 export default function MessagesPage() {
-  const messagesWithProspect = mockMessages.map(msg => ({
-    ...msg,
-    prospect: mockProspects.find(p => p.id === msg.prospectId),
-  }));
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
-          <p className="text-sm text-gray-500">Historique de tous vos envois.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Historique des Messages</h1>
+          <p className="text-sm text-gray-500">Suivez vos interactions et le taux d'engagement de vos campagnes.</p>
         </div>
-        <button className="btn-gold flex items-center gap-2">
-          <Mail className="w-4 h-4" />
-          Nouveau message
-        </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
-          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Envoyés</p>
-          <p className="text-3xl font-bold text-gray-900">{mockMessages.length}</p>
-        </div>
-        <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
-          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Ouverts</p>
-          <p className="text-3xl font-bold text-gray-900">{mockMessages.filter(m => m.opened).length}</p>
-        </div>
-        <div className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
-          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Réponses</p>
-          <p className="text-3xl font-bold text-gray-900">{mockMessages.filter(m => m.replied).length}</p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[
+          { label: 'Total Envoyés', value: '42', icon: Mail, color: 'text-brand-red' },
+          { label: 'Taux d\'Ouverture', value: '68%', icon: Eye, color: 'text-blue-600' },
+          { label: 'Taux de Réponse', value: '24%', icon: Reply, color: 'text-green-600' },
+          { label: 'Messages LinkedIn', value: '15', icon: LinkIcon, color: 'text-sky-600' },
+        ].map((stat) => (
+          <div key={stat.label} className="card-premium p-4">
+            <div className="flex items-center justify-between mb-2">
+              <stat.icon className={cn("w-5 h-5", stat.color)} />
+              <span className="text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded">+5%</span>
+            </div>
+            <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
+            <p className="text-xl font-bold">{stat.value}</p>
+          </div>
+        ))}
       </div>
 
       <div className="bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden">
@@ -44,56 +47,59 @@ export default function MessagesPage() {
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100">
               <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Prospect</th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Canal</th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Message</th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Date</th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Ouvert</th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Réponse</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Type</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Date d'envoi</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Ouvert</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Répondu</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {messagesWithProspect.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-400">
-                  Aucun message envoyé pour l'instant.
-                </td>
-              </tr>
-            ) : (
-              messagesWithProspect.map((msg) => (
+            {mockMessages.map((msg) => {
+              const prospect = mockProspects.find(p => p.id === msg.prospectId);
+              return (
                 <tr key={msg.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="text-sm font-bold text-gray-900">{msg.prospect?.name ?? '—'}</p>
-                    <p className="text-xs text-gray-500">{msg.prospect?.city}</p>
+                    <span className="text-sm font-bold text-gray-900">{prospect?.name || 'Inconnu'}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={cn(
-                      "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
-                      msg.type === 'email'
-                        ? "bg-blue-50 text-blue-700 border-blue-100"
-                        : "bg-indigo-50 text-indigo-700 border-indigo-100"
-                    )}>
-                      {msg.type === 'email' ? <Mail className="w-3 h-3" /> : <MessageCircle className="w-3 h-3" />}
-                      {msg.type}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 max-w-xs">
-                    <p className="text-sm text-gray-600 truncate">{msg.content}</p>
+                    <div className="flex items-center gap-2">
+                      {msg.type === 'email' ? <Mail className="w-4 h-4 text-brand-red" /> : <LinkIcon className="w-4 h-4 text-sky-600" />}
+                      <span className="text-xs font-medium capitalize">{msg.type}</span>
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1 text-sm text-gray-500">
                       <Clock className="w-3.5 h-3.5" />
-                      {new Date(msg.sendDate).toLocaleDateString('fr-FR')}
+                      {new Date(msg.sendDate).toLocaleDateString()}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-center">
-                    <Eye className={cn("w-4 h-4 mx-auto", msg.opened ? "text-green-500" : "text-gray-200")} />
+                  <td className="px-6 py-4">
+                    {msg.opened ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700">
+                        <CheckCircle2 className="w-3 h-3" /> OUI
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-gray-400">NON</span>
+                    )}
                   </td>
-                  <td className="px-6 py-4 text-center">
-                    <CheckCheck className={cn("w-4 h-4 mx-auto", msg.replied ? "text-brand-gold" : "text-gray-200")} />
+                  <td className="px-6 py-4">
+                    {msg.replied ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700">
+                        <Reply className="w-3 h-3" /> RÉPONDU
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-gray-400">EN ATTENTE</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button className="p-1 hover:bg-gray-100 rounded text-gray-400">
+                      <Eye className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
-              ))
-            )}
+              );
+            })}
           </tbody>
         </table>
       </div>

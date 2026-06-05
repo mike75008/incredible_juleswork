@@ -1,99 +1,107 @@
 "use client";
 
 import React from 'react';
-import { Radar, Globe, Clock, MapPin, Building2 } from 'lucide-react';
+import {
+  Radar,
+  MapPin,
+  Clock,
+  ExternalLink,
+  Search,
+  RefreshCw,
+  Globe,
+  Briefcase,
+  FileText
+} from 'lucide-react';
 import { mockProspects } from '@/data/mockData';
 import { cn } from '@/lib/utils';
-
-const signalLabels: Record<string, { label: string; color: string }> = {
-  no_website: { label: 'Sans site', color: 'bg-red-50 text-red-700 border-red-100' },
-  outdated_website: { label: 'Site obsolète', color: 'bg-orange-50 text-orange-700 border-orange-100' },
-  job_offer: { label: 'Recrutement', color: 'bg-blue-50 text-blue-700 border-blue-100' },
-  new_registration: { label: 'Nouveau SIRET', color: 'bg-purple-50 text-purple-700 border-purple-100' },
-};
-
-const sourceMap: Record<string, string> = {
-  no_website: 'Google Maps',
-  outdated_website: 'Analyse web',
-  job_offer: 'LinkedIn / Indeed',
-  new_registration: 'Infogreffe',
-};
 
 export default function DetectionPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Détection</h1>
-          <p className="text-sm text-gray-500">Signaux captés sur les dernières 24h.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Signaux Détectés</h1>
+          <p className="text-sm text-gray-500">Intelligence en temps réel sur les opportunités de marché.</p>
         </div>
         <button className="btn-gold flex items-center gap-2">
-          <Radar className="w-4 h-4" />
-          Lancer un scan
+          <RefreshCw className="w-4 h-4" />
+          Scanner le marché
         </button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
-        {Object.entries(signalLabels).map(([key, val]) => {
-          const count = mockProspects.filter(p => p.detectedSignal === key).length;
-          return (
-            <div key={key} className="bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">{val.label}</p>
-              <p className="text-3xl font-bold text-gray-900">{count}</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { label: 'Signaux aujourd\'hui', value: '12', icon: Radar, color: 'text-brand-red' },
+          { label: 'Sources actives', value: '6', icon: Globe, color: 'text-blue-600' },
+          { label: 'Taux de pertinence', value: '84%', icon: Search, color: 'text-green-600' },
+        ].map((stat) => (
+          <div key={stat.label} className="card-premium p-4 flex items-center gap-4">
+            <div className={cn("p-2 bg-gray-50 rounded-lg", stat.color)}>
+              <stat.icon className="w-5 h-5" />
             </div>
-          );
-        })}
+            <div>
+              <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
+              <p className="text-xl font-bold">{stat.value}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-100">
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Entreprise</th>
               <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Signal</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Entreprise</th>
               <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Ville</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Date</th>
               <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Source</th>
-              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500">Détecté le</th>
+              <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-gray-500"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {mockProspects.map((prospect) => {
-              const sig = signalLabels[prospect.detectedSignal];
+              const Icon = prospect.detectedSignal === 'job_offer' ? Briefcase :
+                           prospect.detectedSignal === 'no_website' ? Globe :
+                           prospect.detectedSignal === 'new_registration' ? FileText : Radar;
+
               return (
                 <tr key={prospect.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-brand-red/10 flex items-center justify-center">
-                        <Building2 className="w-4 h-4 text-brand-red" />
+                      <div className="p-1.5 bg-brand-red/5 rounded text-brand-red">
+                        <Icon className="w-4 h-4" />
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-gray-900">{prospect.name}</p>
-                        <p className="text-xs text-gray-500">{prospect.sector}</p>
-                      </div>
+                      <span className="text-sm font-medium capitalize">
+                        {prospect.detectedSignal.replace('_', ' ')}
+                      </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={cn("inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border", sig.color)}>
-                      {sig.label}
-                    </span>
+                    <span className="text-sm font-bold text-gray-900">{prospect.name}</span>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
                       <MapPin className="w-3.5 h-3.5" />
                       {prospect.city}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <Globe className="w-3.5 h-3.5" />
-                      {sourceMap[prospect.detectedSignal]}
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <Clock className="w-3.5 h-3.5" />
+                      {new Date(prospect.lastActivityDate).toLocaleDateString()}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <Clock className="w-3.5 h-3.5" />
-                      {new Date(prospect.lastActivityDate).toLocaleDateString('fr-FR')}
-                    </div>
+                    <span className="text-xs font-medium px-2 py-1 bg-gray-100 rounded text-gray-600">
+                      {prospect.detectedSignal === 'new_registration' ? 'Infogreffe' :
+                       prospect.detectedSignal === 'job_offer' ? 'LinkedIn' : 'Google Maps'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button className="text-brand-red hover:underline text-sm font-bold">
+                      Voir le prospect
+                    </button>
                   </td>
                 </tr>
               );
